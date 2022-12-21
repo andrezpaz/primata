@@ -30,6 +30,7 @@ function response (req, res) {
 
 io.on("connection", function(socket) {
     socket.on("entrar", function(name, callback){
+    if (name !== '') {
         if(!(name in usuarios)) {
             socket.name = name;
             usuarios[name] = socket;
@@ -50,30 +51,34 @@ io.on("connection", function(socket) {
         } else {
             callback(false);
         }
+    }
     })
 
     socket.on("enviar mensagem", function(dados, callback) {
 
         var mensagem_enviada = dados.msg;
         var usuario = dados.usu;
+
+        if (mensagem_enviada !== '') {
+
+            if(usuario == null) {
+                usuario = '';
+            }
+            
+            mensagem_enviada = " [ " + pegarDataAtual() + " ]:" + socket.name + " diz: " + mensagem_enviada;
+            console.log(mensagem_enviada);
+            var obj_mensagem = {msg: mensagem_enviada, tipo: ''};
         
-        if(usuario == null) {
-            usuario = '';
-        }
-        
-        mensagem_enviada = " [ " + pegarDataAtual() + " ]:" + socket.name + " diz: " + mensagem_enviada;
-        console.log(mensagem_enviada);
-        var obj_mensagem = {msg: mensagem_enviada, tipo: ''};
-    
-        if (usuario == '') {
-            io.sockets.emit("atualizar mensagens", obj_mensagem);
-            armazenaMensagem(obj_mensagem);
-        } else {
-            obj_mensagem.tipo = 'privada'
-            socket.emit("atualizar mensagens", obj_mensagem);
-            usuarios[usuario].emit("atualizar mensagens", obj_mensagem)
-        }
-        callback();
+            if (usuario == '') {
+                io.sockets.emit("atualizar mensagens", obj_mensagem);
+                armazenaMensagem(obj_mensagem);
+            } else {
+                obj_mensagem.tipo = 'privada'
+                socket.emit("atualizar mensagens", obj_mensagem);
+                usuarios[usuario].emit("atualizar mensagens", obj_mensagem)
+            }
+            callback();
+    }
     });
 
     socket.on("disconnect", function(){

@@ -39,7 +39,7 @@ form input[type='submit']{
 #historico_mensagens, #lista_usuarios{
     background: #FFF;
     border:2px solid #45C5BF;
-    height: 550px;
+    height: 450px;
     float: left;
     margin-bottom: 10px;
     width: 75%;
@@ -64,7 +64,6 @@ form input[type='submit']{
 
 #lista_usuarios {
     border-left: 1px solid #45C5BF;
-    height: 554px;
     width: 20%;
 }
 
