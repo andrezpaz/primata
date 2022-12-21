@@ -1,11 +1,22 @@
-var app = require('http').createServer(response);
 var fs = require('fs');
+
+const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/primata.bazei.com.br/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/primata.bazei.com.br/cert.pem'),
+};
+
+var app = require('https').createServer(options, response).listen(3001);
+
 var io = require('socket.io')(app);
+
+
 
 var usuarios = [];
 var ultimas_mensagens = [];
 
-app.listen(3001);
+//app.createServer(options, response).listen(3001);
+//app.createServer(response).listen(3001);
+//app.listen(3001)
 console.log("App it's running...");
 
 
