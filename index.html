@@ -31,7 +31,66 @@
      </form>
 </div>
 
-     <script type="text/javascript">
+<script type="text/javascript">
+
+var hidden, visibilityChange;
+if (typeof document.hidden !== "undefined") {
+  hidden = "hidden";
+  visibilityChange = "visibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  hidden = "msHidden";
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  hidden = "webkitHidden";
+  visibilityChange = "webkitvisibilitychange";
+}
+
+function windowBackground() {
+  if (document[hidden]) {
+    console.log("Page is running in the background");
+    return true
+  } else {
+    console.log("Page is open in a browser window");
+    return false
+  }
+}
+
+document.addEventListener(visibilityChange, windowBackground, false);
+
+
+function notifyMe(msg) {
+    if(windowBackground()) {
+        const audio = "./notifi.wav";
+        new Audio(audio).play()
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notification");
+        }
+        else if (Notification.permission === "granted") {
+                var options = {
+                        body: "This is the body of the notification",
+                        icon: "icon.jpg",
+                        dir : "ltr"
+                    };
+                var notification = new Notification(msg);
+        }
+        else if (Notification.permission !== 'denied') {
+            Notification.requestPermission(function (permission) {
+            if (!('permission' in Notification)) {
+                Notification.permission = permission;
+            }
+        
+            if (permission === "granted") {
+                var options = {
+                    body: "This is the body of the notification",
+                    icon: "icon.jpg",
+                    dir : "ltr"
+                };
+                var notification = new Notification(msg);
+            }
+            });
+        } 
+    }  
+}
 
         var socket = io.connect();
         $("form#chat").submit(function(e){
@@ -41,7 +100,8 @@
             var usuario = $("#lista_usuarios").val();
 
             socket.emit("enviar mensagem", {msg: mensagem, usu: usuario}, function() {
-                $("form#chat #texto_mensagem").val(""); 
+                $("form#chat #texto_mensagem").val("");
+                
             })
 
         })
@@ -50,6 +110,15 @@
             $("#historico_mensagens").append(mensagem_formatada);
             var scroll = document.getElementById('historico_mensagens');
             scroll.scrollTop = scroll.scrollHeight;
+            
+        })
+
+        socket.on("notify mensagem", function(obj_msg){
+            
+            let usuario_origem = document.getElementById("name").value;
+            if (usuario_origem !== obj_msg.usuario_destino) {
+                notifyMe(obj_msg.msg)
+            }
         })
 
         $("form#login").submit(function(e){

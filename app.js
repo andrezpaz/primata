@@ -39,6 +39,8 @@ function response (req, res) {
     })
 }
 
+
+
 io.on("connection", function(socket) {
     socket.on("entrar", function(name, callback){
     if (name !== '') {
@@ -77,20 +79,23 @@ io.on("connection", function(socket) {
             }
             
             mensagem_enviada = " [ " + pegarDataAtual() + " ]:" + socket.name + " diz: " + mensagem_enviada;
-            console.log(mensagem_enviada);
             var obj_mensagem = {msg: mensagem_enviada, tipo: ''};
-        
+            var obj_msg = {msg: mensagem_enviada, usuario_destino:socket.name }
             if (usuario == '') {
                 io.sockets.emit("atualizar mensagens", obj_mensagem);
                 armazenaMensagem(obj_mensagem);
+                io.sockets.emit("notify mensagem", obj_msg);
             } else {
                 obj_mensagem.tipo = 'privada'
                 socket.emit("atualizar mensagens", obj_mensagem);
-                usuarios[usuario].emit("atualizar mensagens", obj_mensagem)
+                usuarios[usuario].emit("atualizar mensagens", obj_mensagem);
+                usuarios[usuario].emit("notify mensagem", obj_msg);
             }
             callback();
     }
     });
+
+
 
     socket.on("disconnect", function(){
         delete usuarios[socket.name];
