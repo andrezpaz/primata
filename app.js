@@ -53,6 +53,7 @@ io.on("connection", function(socket) {
             }
 
             var mensagem = "[ " + pegarDataAtual() + " ] " + name + " acabou de entrar na sala";
+            console.log(mensagem);
             var obj_mensagem = {msg: mensagem, tipo: 'sistema'};
 
             io.sockets.emit("atualizar usuarios", Object.keys(usuarios));
@@ -79,6 +80,7 @@ io.on("connection", function(socket) {
             }
             
             mensagem_enviada = " [ " + pegarDataAtual() + " ]:" + socket.name + " diz: " + mensagem_enviada;
+            console.log(mensagem_enviada);
             var obj_mensagem = {msg: mensagem_enviada, tipo: ''};
             var obj_msg = {msg: mensagem_enviada, usuario_destino:socket.name }
             if (usuario == '') {
@@ -100,6 +102,7 @@ io.on("connection", function(socket) {
     socket.on("disconnect", function(){
         delete usuarios[socket.name];
         var mensagem = "[ " + pegarDataAtual() + " ] " + socket.name + " saiu da sala";
+        console.log(mensagem);
         var obj_mensagem = {msg: mensagem, tipo: 'sistema'}; 
         io.sockets.emit("atualizar usuarios", Object.keys(usuarios));
         io.sockets.emit("atualizar mensagens", obj_mensagem);
